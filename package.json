@@ -1,0 +1,23 @@
+{
+  "name": "spot-module",
+  "version": "1.0.0",
+  "description": "spot module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pinkgorilla/spot-module.git"
+  },
+  "author": "Tris Setiawan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pinkgorilla/spot-module/issues"
+  },
+  "homepage": "https://github.com/pinkgorilla/spot-module#readme",
+  "dependencies": {
+    "mean-toolkit": "git+https://git@github.com/pinkgorilla/mean-toolkit.git",
+    "spot-models": "git+https://git@github.com/pinkgorilla/spot-models.git"
+  }
+}
