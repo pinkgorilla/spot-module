@@ -5,25 +5,24 @@ var validate = require('spot-models').validate;
 var manager;
 
 function getData() {
-    var SpotType = require('spot-models').SpotType;
-    var spotType = new SpotType();
+    var Spot = require('spot-models').Spot;
+    var spot = new Spot();
 
     var now = new Date();
     var stamp = now / 1000 | 0;
     var code = stamp.toString(36);
-    spotType.code = code;
-    spotType.name = `name[${code}]`;
-    spotType.description = `description for ${code}`;
-    spotType.icon = `icon[${code}]`;
+    spot.code = code;
+    spot.name = `name[${code}]`;
+    spot.description = `description for ${code}`;
 
-    return spotType;
+    return spot;
 }
 
 before('#00. connect db', function(done) {
     helper.getDb()
         .then(db => {
-            var SpotTypeManager = require('../../src/managers/spot-type-manager');
-            manager = new SpotTypeManager(db, {
+            var SpotManager = require('../../src/managers/spot-manager');
+            manager = new SpotManager(db, {
                 username: 'unit-test'
             });
             done();
@@ -51,7 +50,7 @@ var createdData;
 it(`#02. should success when get created data with id`, function(done) {
     manager.getSingleById(createdId)
         .then(data => {
-            validate.spotType(data);
+            validate.spot(data);
             createdData = data;
             done();
         })
@@ -78,10 +77,9 @@ it(`#03. should success when update created data`, function(done) {
 it(`#04. should success when get updated data with id`, function(done) {
     manager.getSingleById(createdId)
         .then(data => {
-            validate.spotType(data);
+            validate.spot(data);
             data.name.should.equal(createdData.name);
             data.description.should.equal(createdData.description);
-            data.icon.should.equal(createdData.icon);
             done();
         })
         .catch(e => {
@@ -105,7 +103,7 @@ it(`#06. should _deleted=true`, function(done) {
             _id: new ObjectId(createdId)
         })
         .then(data => {
-            validate.spotType(data);
+            validate.spot(data);
             data._deleted.should.be.Boolean();
             data._deleted.should.equal(true);
             done();

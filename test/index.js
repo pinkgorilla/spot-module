@@ -8,4 +8,5 @@ function test(name, path) {
 describe('#bateeq-module', function(done) {
     this.timeout(2 * 6000); 
     test('@manager/spot-type-manager', './managers/spot-type-manager-test');
+    test('@manager/spot-manager', './managers/spot-manager-test');
 })
