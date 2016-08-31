@@ -114,3 +114,19 @@ it(`#06. should _deleted=true`, function(done) {
             done(e);
         })
 });
+
+it('#07. should error with property name ', function(done) {
+    manager.create({})
+        .then(id => {
+            done("Should not be error with property name");
+        })
+        .catch(e => {
+            try {
+                e.errors.should.have.property('name');
+                done();
+            }
+            catch (ex) {
+                done(ex);
+            }
+        })
+});
