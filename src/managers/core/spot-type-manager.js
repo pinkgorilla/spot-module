@@ -2,28 +2,28 @@
 // external deps
 var ObjectId = require('mongodb').ObjectId;
 var SpotModels = require('spot-models');
-var Spot = SpotModels.Spot
-var BaseManager = require('./base-manager');
+var SpotType = SpotModels.core.SpotType
+var BaseManager = require('../base-manager');
 require("mongodb-toolkit");
 
-module.exports = class SpotManager extends BaseManager {
+module.exports = class SpotTypeManager extends BaseManager {
     constructor(db, user) {
         super(db, user);
-        this.collection = this.db.use('spots');
+        this.collection = this.db.use('spot-types');
     }
 
     _validate(data) {
         var errors = {};
         return new Promise((resolve, reject) => { 
-
+ 
             if (!data.name || data.name == '')
                 errors["name"] = "name is required";
 
             for (var prop in errors) {
-                var ValidationError = require('../validation-error');
+                var ValidationError = require('../../validation-error');
                 reject(new ValidationError('data does not pass validation', errors));
             }
-            var valid = new Spot(data);
+            var valid = new SpotType(data);
             valid.stamp(this.user.username, 'manager');
             resolve(valid);
         });
@@ -57,4 +57,5 @@ module.exports = class SpotManager extends BaseManager {
         }
         return query;
     }
+
 }

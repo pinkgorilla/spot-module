@@ -1,11 +1,11 @@
 require('should');
 var ObjectId = require('mongodb').ObjectId;
-var helper = require('../helper');
-var validate = require('spot-models').validate;
+var helper = require('../../helper');
+var validate = require('spot-models').validator.core;
 var manager;
 
 function getData() {
-    var Spot = require('spot-models').Spot;
+    var Spot = require('spot-models').core.Spot;
     var spot = new Spot();
 
     var now = new Date();
@@ -21,7 +21,7 @@ function getData() {
 before('#00. connect db', function(done) {
     helper.getDb()
         .then(db => {
-            var SpotManager = require('../../src/managers/spot-manager');
+            var SpotManager = require('../../../src/managers/core/spot-manager');
             manager = new SpotManager(db, {
                 username: 'unit-test'
             });
@@ -29,7 +29,7 @@ before('#00. connect db', function(done) {
         })
         .catch(e => {
             done(e);
-        })
+        });
 });
 
 var createdId;
@@ -84,7 +84,7 @@ it(`#04. should success when get updated data with id`, function(done) {
         })
         .catch(e => {
             done(e);
-        })
+        });
 });
 
 it(`#05. should success when delete data`, function(done) {
@@ -110,7 +110,7 @@ it(`#06. should _deleted=true`, function(done) {
         })
         .catch(e => {
             done(e);
-        })
+        });
 });
 
 it('#07. should error with property name ', function(done) {
@@ -126,5 +126,5 @@ it('#07. should error with property name ', function(done) {
             catch (ex) {
                 done(ex);
             }
-        })
+        });
 });

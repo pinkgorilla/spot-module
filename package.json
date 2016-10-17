@@ -18,7 +18,8 @@
   "homepage": "https://github.com/pinkgorilla/spot-module#readme",
   "dependencies": {
     "mongodb-toolkit": "git+https://github.com/pinkgorilla/mongodb-toolkit.git",
-    "spot-models": "git+https://git@github.com/pinkgorilla/spot-models.git"
+    "spot-models": "git+https://git@github.com/pinkgorilla/spot-models.git",
+    "sha1": "^1.1.1"
   },
   "devDependencies": {
     "mocha": "^2.5.3",
