@@ -94,6 +94,27 @@ module.exports = class AccountManager extends BaseManager {
         });
     }
 
+    checkEmailIsUsed(email) {
+        return new Promise((resolve, reject) => {
+            if (email === '')
+                resolve(null);
+
+            var regex = new RegExp(email, "i");
+            var query = {
+                'email': {
+                    '$regex': regex
+                }
+            };
+            this.collection.count(query)
+                .then(count => {
+                    resolve(count > 0);
+                })
+                .catch(e => {
+                    reject(e);
+                });
+        });
+    }
+
     _getQuery(paging) {
         var deleted = {
             _deleted: false
