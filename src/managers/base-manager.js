@@ -28,6 +28,8 @@ module.exports = class BaseManager {
         var _paging = Object.assign({
             page: 1,
             size: 20,
+            order: {},
+            filter: {},
             asc: true
         }, paging);
         // var start = process.hrtime();
@@ -38,6 +40,7 @@ module.exports = class BaseManager {
                     var query = this._getQuery(_paging);
                     this.collection
                         .where(query)
+                        .select(_paging.select)
                         .page(_paging.page, _paging.size)
                         .order(_paging.order)
                         .execute()

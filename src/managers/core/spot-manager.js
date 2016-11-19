@@ -14,15 +14,16 @@ module.exports = class SpotManager extends BaseManager {
 
     _validate(data) {
         var errors = {};
-        return new Promise((resolve, reject) => { 
+        return new Promise((resolve, reject) => {
 
             if (!data.name || data.name == '')
                 errors["name"] = "name is required";
 
-            for (var prop in errors) {
+            if (Object.getOwnPropertyNames(errors).length > 0) {
                 var ValidationError = require('../../validation-error');
                 reject(new ValidationError('data does not pass validation', errors));
             }
+
             var valid = new Spot(data);
             valid.stamp(this.user.username, 'manager');
             resolve(valid);
@@ -30,12 +31,11 @@ module.exports = class SpotManager extends BaseManager {
     }
 
     _getQuery(_paging) {
-        var deleted = {
-            _deleted: false
-        };
-        var query = _paging.keyword ? {
-            '$and': [deleted]
-        } : deleted;
+        var basicFilter = {
+                _deleted: false
+            },
+            keywordFilter = {};
+        var query = {};
 
         if (_paging.keyword) {
             var regex = new RegExp(_paging.keyword, "i");
@@ -49,12 +49,14 @@ module.exports = class SpotManager extends BaseManager {
                     '$regex': regex
                 }
             };
-            var $or = {
+            keywordFilter = {
                 '$or': [filterCode, filterName]
             };
 
-            query['$and'].push($or);
         }
+        query = {
+            '$and': [basicFilter, _paging.filter, keywordFilter]
+        };
         return query;
     }
-}
+};
