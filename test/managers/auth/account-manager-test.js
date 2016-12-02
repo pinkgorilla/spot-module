@@ -1,11 +1,11 @@
 var helper = require("../../helper");
 var AccountManager = require("../../../src/managers/auth/account-manager");
-var validateAccount = require('spot-models').validator.auth.account;
+var validateAccount = require("spot-models").validator.auth.account;
 var instanceManager = null;
 require("should");
 
 function getData() {
-    var Account = require('spot-models').auth.Account;
+    var Account = require("spot-models").auth.Account;
     var account = new Account();
 
     var now = new Date();
@@ -15,9 +15,9 @@ function getData() {
     account.username = `user${code}@unit.test`;
     account.password = "Standar123";
     account.profile = {
-        firstname: 'unit',
-        lastname: 'test',
-        gender: 'M',
+        firstname: "unit",
+        lastname: "test",
+        gender: "M",
         dob: new Date(),
         email: account.username
     };
@@ -25,11 +25,11 @@ function getData() {
 }
 
 
-before('#00. connect db', function(done) {
+before("#00. connect db", function(done) {
     helper.getDb()
         .then(db => {
             instanceManager = new AccountManager(db, {
-                username: 'unit-test'
+                username: "unit-test"
             });
             done();
         })
@@ -38,7 +38,7 @@ before('#00. connect db', function(done) {
         })
 });
 
-it('#01. should success when read data', function(done) {
+it("#01. should success when read data", function(done) {
     instanceManager.read()
         .then(documents => {
             //process documents
@@ -51,7 +51,7 @@ it('#01. should success when read data', function(done) {
 });
 
 var createdId;
-it('#02. should success when create new data', function(done) {
+it("#02. should success when create new data", function(done) {
     var data = getData();
     instanceManager.create(data)
         .then(id => {
@@ -84,8 +84,8 @@ it(`#03. should success when get created data with id`, function(done) {
 
 it(`#03. should success when update created data`, function(done) {
 
-    createdData.profile.lastname += '[updated]';
-    createdData.password = '';
+    createdData.profile.lastname += "[updated]";
+    createdData.password = "";
 
     instanceManager.update(createdData)
         .then(id => {
@@ -104,7 +104,7 @@ it(`#04. should success when get updated data with id`, function(done) {
         .then(data => {
             data.profile.firstname.should.equal(createdData.profile.firstname);
             data.profile.lastname.should.equal(createdData.profile.lastname);
-            data.password.should.not.equal('');
+            data.password.should.not.equal("");
             validateAccount(data);
             done();
         })
@@ -141,7 +141,7 @@ it(`#06. should _deleted=true`, function(done) {
 });
 
 
-it('#07. should error when create new data with same username', function(done) {
+it("#07. should error when create new data with same username", function(done) {
     var data = Object.assign({}, createdData);
     delete data._id;
     instanceManager.create(data)
@@ -151,21 +151,21 @@ it('#07. should error when create new data with same username', function(done) {
             done("Should not be able to create data with same username");
         })
         .catch(e => {
-            e.errors.should.have.property('username');
+            e.errors.should.have.property("username");
             done();
         })
 });
 
-it('#08. should error with property username, password, and profile ', function(done) {
+it("#08. should error with property username, password, and profile ", function(done) {
     instanceManager.create({})
         .then(id => {
             done("Should error with property username, password and profile");
         })
         .catch(e => {
             try {
-                e.errors.should.have.property('username');
-                e.errors.should.have.property('password');
-                e.errors.should.have.property('profile');
+                e.errors.should.have.property("username");
+                e.errors.should.have.property("password");
+                e.errors.should.have.property("profile");
                 done();
             }
             catch (ex) {
@@ -175,18 +175,18 @@ it('#08. should error with property username, password, and profile ', function(
 });
 
 
-it('#09. should error with property username, password, profile.firstname and profile.gender ', function(done) {
+it("#09. should error with property username, password, profile.firstname and profile.gender ", function(done) {
     instanceManager.create({profile:{}})
         .then(id => {
             done("Should error with property username, password and profile");
         })
         .catch(e => {
             try {
-                e.errors.should.have.property('username');
-                e.errors.should.have.property('password');
-                e.errors.should.have.property('profile');
-                e.errors.profile.should.have.property('firstname');
-                e.errors.profile.should.have.property('gender');
+                e.errors.should.have.property("username");
+                e.errors.should.have.property("password");
+                e.errors.should.have.property("profile");
+                e.errors.profile.should.have.property("firstname");
+                e.errors.profile.should.have.property("gender");
                 done();
             }
             catch (ex) {
