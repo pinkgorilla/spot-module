@@ -23,6 +23,7 @@
     "hashids": "^1.1.1",
     "module-toolkit": "git+https://github.com/pinkgorilla/module-toolkit.git",
     "moment": "^2.17.0",
+    "mongo-factory": "^1.0.0",
     "mongodb-toolkit": "git+https://github.com/pinkgorilla/mongodb-toolkit.git",
     "sha1": "^1.1.1",
     "spot-models": "git+https://git@github.com/pinkgorilla/spot-models.git"
