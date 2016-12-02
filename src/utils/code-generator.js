@@ -1,4 +1,4 @@
-var ObjectId = require('mongodb').ObjectId;
+var ObjectId = require("mongodb").ObjectId;
 var Hashids = require("hashids");
 var moment = require("moment");
 

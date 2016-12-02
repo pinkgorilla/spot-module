@@ -41,11 +41,11 @@ module.exports = class SpotManager extends BaseManager {
         if (paging.keyword) {
             var regex = new RegExp(paging.keyword, "i");
             var nameFilter = {
-                'name': {
-                    '$regex': regex
+                "name": {
+                    "$regex": regex
                 }
             };
-            keywordFilter['$or'] = [nameFilter];
+            keywordFilter["$or"] = [nameFilter];
         }
         query["$and"] = [_default, keywordFilter, pagingFilter];
         return query;

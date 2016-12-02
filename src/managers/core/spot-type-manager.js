@@ -15,18 +15,17 @@ module.exports = class SpotTypeManager extends BaseManager {
 
     _validate(data) {
         var errors = {};
-        return new Promise((resolve, reject) => {
 
-            if (!data.name || data.name == "") {
-                errors["name"] = "name is required";
-            }
-            if (Object.getOwnPropertyNames(errors).length > 0) {
-                reject(new ValidationError("data does not pass validation", errors));
-            }
-            var valid = new SpotType(data);
-            valid.stamp(this.user.username, "manager");
-            resolve(valid);
-        });
+        if (!data.name || data.name == "") {
+            errors["name"] = "name is required";
+        }
+        
+        if (Object.getOwnPropertyNames(errors).length > 0) {
+            return Promise.reject(new ValidationError("data does not pass validation", errors));
+        }
+        var valid = new SpotType(data);
+        valid.stamp(this.user.username, "manager");
+        return Promise.resolve(valid);
     }
 
     _getQuery(paging) {
@@ -40,14 +39,13 @@ module.exports = class SpotTypeManager extends BaseManager {
         if (paging.keyword) {
             var regex = new RegExp(paging.keyword, "i");
             var nameFilter = {
-                'name': {
-                    '$regex': regex
+                "name": {
+                    "$regex": regex
                 }
             };
-            keywordFilter['$or'] = [nameFilter];
+            keywordFilter["$or"] = [nameFilter];
         }
         query["$and"] = [_default, keywordFilter, pagingFilter];
         return query;
     }
-
-}
+};
