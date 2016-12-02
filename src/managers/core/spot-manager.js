@@ -1,62 +1,73 @@
-'use strict'
+"use strict";
 // external deps
-var ObjectId = require('mongodb').ObjectId;
-var SpotModels = require('spot-models');
-var Spot = SpotModels.core.Spot
-var BaseManager = require('../base-manager');
+var ObjectId = require("mongodb").ObjectId;
+var SpotModels = require("spot-models");
+var map = SpotModels.map;
+var Spot = SpotModels.core.Spot;
+var BaseManager = require("module-toolkit").BaseManager;
+var ValidationError = require("module-toolkit").ValidationError;
 require("mongodb-toolkit");
 
 module.exports = class SpotManager extends BaseManager {
     constructor(db, user) {
         super(db, user);
-        this.collection = this.db.use('spots');
+        this.collection = this.db.use("spots");
     }
 
     _validate(data) {
         var errors = {};
-        return new Promise((resolve, reject) => {
 
-            if (!data.name || data.name == '')
-                errors["name"] = "name is required";
+        if (!data.name || data.name == "") {
+            errors["name"] = "name is required";
+        }
 
-            if (Object.getOwnPropertyNames(errors).length > 0) {
-                var ValidationError = require('../../validation-error');
-                reject(new ValidationError('data does not pass validation', errors));
-            }
+        if (Object.getOwnPropertyNames(errors).length > 0) {
+            return Promise.reject(new ValidationError("data does not pass validation", errors));
+        }
 
-            var valid = new Spot(data);
-            valid.stamp(this.user.username, 'manager');
-            resolve(valid);
-        });
+        var valid = new Spot(data);
+        valid.stamp(this.user.username, "manager");
+        return Promise.resolve(valid);
     }
 
-    _getQuery(_paging) {
-        var basicFilter = {
+    _getQuery(paging) {
+        var _default = {
                 _deleted: false
             },
-            keywordFilter = {};
-        var query = {};
+            pagingFilter = paging.filter || {},
+            keywordFilter = {},
+            query = {};
 
-        if (_paging.keyword) {
-            var regex = new RegExp(_paging.keyword, "i");
-            var filterCode = {
-                'code': {
-                    '$regex': regex
-                }
-            };
-            var filterName = {
+        if (paging.keyword) {
+            var regex = new RegExp(paging.keyword, "i");
+            var nameFilter = {
                 'name': {
                     '$regex': regex
                 }
             };
-            keywordFilter = {
-                '$or': [filterCode, filterName]
-            };
-
+            keywordFilter['$or'] = [nameFilter];
         }
-        query = {
-            '$and': [basicFilter, _paging.filter, keywordFilter]
-        };
+        query["$and"] = [_default, keywordFilter, pagingFilter];
         return query;
+    }
+
+    _createIndexes() {
+        var dateIndex = {
+            name: `ix_${map.core.collection.Spot}__updatedDate`,
+            key: {
+                _updatedDate: -1
+            }
+        };
+
+        var nameRateIndex = {
+            name: `ix_${map.core.collection.Spot}_name`,
+            key: {
+                name: 1,
+                rate: 1
+            },
+            unique: true
+        };
+
+        return this.collection.createIndexes([dateIndex, nameRateIndex]);
     }
 };

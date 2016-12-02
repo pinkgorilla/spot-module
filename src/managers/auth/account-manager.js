@@ -1,12 +1,13 @@
-'use strict'
+"use strict";
 require("mongodb-toolkit");
 
 var ObjectId = require("mongodb").ObjectId;
-var SpotModels = require('spot-models');
+var SpotModels = require("spot-models");
 var map = SpotModels.map;
 var Account = SpotModels.auth.Account;
 
-var BaseManager = require('../base-manager');
+var BaseManager = require("module-toolkit").BaseManager;
+var ValidationError = require("module-toolkit").ValidationError;
 var sha1 = require("sha1");
 
 module.exports = class AccountManager extends BaseManager {
@@ -76,7 +77,7 @@ module.exports = class AccountManager extends BaseManager {
 
     authenticate(username, password) {
         return new Promise((resolve, reject) => {
-            if (username === '')
+            if (username === "")
                 resolve(null);
             var query = {
                 username: username,
@@ -96,13 +97,13 @@ module.exports = class AccountManager extends BaseManager {
 
     checkEmailIsUsed(email) {
         return new Promise((resolve, reject) => {
-            if (email === '')
+            if (email === "")
                 resolve(null);
 
             var regex = new RegExp(email, "i");
             var query = {
-                'email': {
-                    '$regex': regex
+                "email": {
+                    "$regex": regex
                 }
             };
             this.collection.count(query)
@@ -120,32 +121,32 @@ module.exports = class AccountManager extends BaseManager {
             _deleted: false
         };
         var query = paging.keyword ? {
-            '$and': [deleted]
+            "$and": [deleted]
         } : deleted;
 
         if (paging.keyword) {
             var regex = new RegExp(paging.keyword, "i");
             var filterUsername = {
-                'username': {
-                    '$regex': regex
+                "username": {
+                    "$regex": regex
                 }
             };
             var filterName = {
-                '$or': [{
-                    'profile.firstname': {
-                        '$regex': regex
+                "$or": [{
+                    "profile.firstname": {
+                        "$regex": regex
                     }
                 }, {
-                    'profile.lastname': {
-                        '$regex': regex
+                    "profile.lastname": {
+                        "$regex": regex
                     }
                 }]
             };
             var $or = {
-                '$or': [filterUsername, filterName]
+                "$or": [filterUsername, filterName]
             };
 
-            query['$and'].push($or);
+            query["$and"].push($or);
         }
         return query;
     }
@@ -158,11 +159,11 @@ module.exports = class AccountManager extends BaseManager {
             var getAccountPromise = this.collection.singleOrDefault({
                 "$and": [{
                     _id: {
-                        '$ne': new ObjectId(valid._id)
+                        "$ne": new ObjectId(valid._id)
                     }
                 }, {
                     username: {
-                        '$regex': new RegExp((valid.username || '').trim(), "i")
+                        "$regex": new RegExp((valid.username || "").trim(), "i")
                     }
                 }]
             });
@@ -171,23 +172,23 @@ module.exports = class AccountManager extends BaseManager {
                 .then(results => {
                     var _module = results[0];
 
-                    if (!valid.username || valid.username == '')
+                    if (!valid.username || valid.username == "")
                         errors["username"] = "Username harus diisi";
                     else if (_module) {
                         errors["username"] = "Username sudah ada";
                     }
 
-                    if (!valid._id && (!valid.password || valid.password == ''))
+                    if (!valid._id && (!valid.password || valid.password == ""))
                         errors["password"] = "password is required";
 
                     if (!valid.profile)
                         errors["profile"] = "profile is required";
                     else {
                         var profileError = {};
-                        if (!valid.profile.firstname || valid.profile.firstname == '')
+                        if (!valid.profile.firstname || valid.profile.firstname == "")
                             profileError["firstname"] = "firstname harus diisi";
 
-                        if (!valid.profile.gender || valid.profile.gender == '')
+                        if (!valid.profile.gender || valid.profile.gender == "")
                             profileError["gender"] = "gender harus diisi";
 
                         if (Object.getOwnPropertyNames(profileError).length > 0)
@@ -196,13 +197,12 @@ module.exports = class AccountManager extends BaseManager {
 
 
                     // 2c. begin: check if data has any error, reject if it has.
-                    if (Object.getOwnPropertyNames(errors).length > 0) {
-                        var ValidationError = require('../../validation-error');
-                        reject(new ValidationError('data does not pass validation', errors));
+                    if (Object.getOwnPropertyNames(errors).length > 0) { 
+                        reject(new ValidationError("data does not pass validation", errors));
                     }
 
                     valid = new Account(account);
-                    valid.stamp(this.user.username, 'manager');
+                    valid.stamp(this.user.username, "manager");
                     resolve(valid);
                 })
                 .catch(e => {

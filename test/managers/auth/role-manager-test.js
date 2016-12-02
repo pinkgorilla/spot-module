@@ -1,11 +1,11 @@
 var helper = require("../../helper");
 var RoleManager = require("../../../src/managers/auth/role-manager");
-var validateRole = require('spot-models').validator.auth.role;
+var validateRole = require("spot-models").validator.auth.role;
 var instanceManager = null;
 require("should");
 
 function getData() {
-    var Role = require('spot-models').auth.Role;
+    var Role = require("spot-models").auth.Role;
     var role = new Role();
 
     var now = new Date();
@@ -18,11 +18,11 @@ function getData() {
 }
 
 
-before('#00. connect db', function (done) {
+before("#00. connect db", function (done) {
     helper.getDb()
         .then(db => {
             instanceManager = new RoleManager(db, {
-                username: 'unit-test'
+                username: "unit-test"
             });
             done();
         })
@@ -31,7 +31,7 @@ before('#00. connect db', function (done) {
         });
 });
 
-it('#01. should success when read data', function (done) {
+it("#01. should success when read data", function (done) {
     instanceManager.read()
         .then(documents => {
             //process documents
@@ -44,7 +44,7 @@ it('#01. should success when read data', function (done) {
 });
 
 var createdId;
-it('#02. should success when create new data', function (done) {
+it("#02. should success when create new data", function (done) {
     var data = getData();
     instanceManager.create(data)
         .then(id => {
@@ -75,8 +75,8 @@ it(`#03. should success when get created data with id`, function (done) {
 
 it(`#03. should success when update created data`, function (done) {
 
-    createdData.code += '[updated]';
-    createdData.name += '[updated]'; 
+    createdData.code += "[updated]";
+    createdData.name += "[updated]"; 
 
     instanceManager.update(createdData)
         .then(id => {
@@ -127,7 +127,7 @@ it(`#06. should _deleted=true`, function (done) {
 });
 
 
-it('#07. should error when create new data with same code', function (done) {
+it("#07. should error when create new data with same code", function (done) {
     var data = Object.assign({}, createdData);
     delete data._id;
     instanceManager.create(data)
@@ -137,20 +137,20 @@ it('#07. should error when create new data with same code', function (done) {
             done("Should not be able to create data with same code");
         })
         .catch(e => {
-            e.errors.should.have.property('code');
+            e.errors.should.have.property("code");
             done();
         })
 });
 
-it('#08. should error with property code and name ', function (done) {
+it("#08. should error with property code and name ", function (done) {
     instanceManager.create({})
         .then(id => {
             done("Should not be error with property code and name");
         })
         .catch(e => {
             try {
-                e.errors.should.have.property('code');
-                e.errors.should.have.property('name');
+                e.errors.should.have.property("code");
+                e.errors.should.have.property("name");
                 done();
             } catch (ex) {
                 done(ex);
