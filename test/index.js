@@ -10,6 +10,7 @@ describe("#bateeq-module", function(done) {
     
     test("@AUTH/ACCOUNT-MANAGER", "./managers/auth/account");
     test("@AUTH/ROLE-MANAGER", "./managers/auth/role"); 
+    test("@AUTH/AUTH-MANAGER", "./managers/auth/auth"); 
 
     test("@CORE/SPOT-TYPE-MANAGER", "./managers/core/spot-type");
     test("@CORE/SPOT-MANAGER", "./managers/core/spot");
