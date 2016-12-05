@@ -31,7 +31,7 @@ class AccountDataUtil {
                     lastname: code,
                     gender: "M",
                     dob: new Date(),
-                    email: `${code}@unit.test` 
+                    email: `${code}@unit.test`
                 };
                 data.roles = [role];
                 data.facebook = {};
@@ -48,6 +48,9 @@ class AccountDataUtil {
                 data.email = "dev@unit.test";
                 data.profile.firstname = "Test";
                 data.profile.lastname = "Unit";
+                data.profile.email = "dev@unit.test";
+                data.profile.gender = "M";
+                data.profile.dob = new Date();
                 return this.getSert(data);
             });
     }
