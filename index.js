@@ -2,6 +2,7 @@ module.exports = {
     managers: {
         auth: {
             AccountManager: require("./src/managers/auth/account-manager"),
+            AuthManager: require("./src/managers/auth/auth-manager"),
             RoleManager: require("./src/managers/auth/role-manager")
         },
         core: {
