@@ -21,6 +21,7 @@
   "homepage": "https://github.com/pinkgorilla/spot-module#readme",
   "dependencies": {
     "hashids": "^1.1.1",
+    "model-toolkit": "git+https://github.com/pinkgorilla/model-toolkit.git",
     "module-toolkit": "git+https://github.com/pinkgorilla/module-toolkit.git",
     "moment": "^2.17.0",
     "mongo-factory": "^1.0.0",
