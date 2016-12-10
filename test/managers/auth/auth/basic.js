@@ -19,7 +19,7 @@ before("#00. connect db", function(done) {
         });
 });
 
-it("#01. should error when create new account with empty data", function(done) {
+it("#01. should success when authenticate", function(done) {
     Account.getTestData()
         .then((account) => {
             instanceManager.authenticate(account.username, "Standar123")
