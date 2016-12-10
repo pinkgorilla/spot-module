@@ -16,104 +16,17 @@ module.exports = class AccountManager extends BaseManager {
         this.collection = this.db.use(map.auth.collection.Account);
     }
 
-    create(account) {
-        return new Promise((resolve, reject) => {
-            this._validate(account)
-                .then(validAccount => {
-                    validAccount.password = sha1(validAccount.password);
-                    this.collection.insert(validAccount)
-                        .then(id => {
-                            resolve(id);
-                        })
-                        .catch(e => {
-                            reject(e);
-                        });
-                })
-                .catch(e => {
-                    reject(e);
-                });
-        });
+    _beforeInsert(data) {
+        data.password = sha1(data.password);
+        return Promise.resolve(data);
     }
 
-    update(account) {
-        return new Promise((resolve, reject) => {
-            this._validate(account)
-                .then(validAccount => {
-                    if (validAccount.password && validAccount.password.length > 0)
-                        validAccount.password = sha1(validAccount.password);
-                    else
-                        delete validAccount.password;
-                    this.collection.update(validAccount)
-                        .then(id => {
-                            resolve(id);
-                        })
-                        .catch(e => {
-                            reject(e);
-                        });
-
-                    // var q = {
-                    //     username: validAccount.username
-                    // };
-                    // this.getSingleByQuery(q)
-                    //     .then(dbAccount => {
-                    //         validAccount.password = validAccount.password.length < 1 ? dbAccount.password : sha1(validAccount.password);
-                    //         this.collection.update(validAccount)
-                    //             .then(id => {
-                    //                 resolve(id);
-                    //             })
-                    //             .catch(e => {
-                    //                 reject(e);
-                    //             });
-                    //     })
-                    //     .catch(e => {
-                    //         reject(e);
-                    //     });
-                })
-                .catch(e => {
-                    reject(e);
-                });
-        });
-    }
-
-    authenticate(username, password) {
-        return new Promise((resolve, reject) => {
-            if (username === "")
-                resolve(null);
-            var query = {
-                username: username,
-                password: sha1(password),
-                _deleted: false
-            };
-            this.getSingleByQuery(query)
-                .then(account => {
-                    delete account.password;
-                    resolve(account);
-                })
-                .catch(e => {
-                    reject(e);
-                });
-        });
-    }
-
-    checkEmailIsUsed(email) {
-        return new Promise((resolve, reject) => {
-            if (email === "")
-                resolve(null);
-
-            var regex = new RegExp(email, "i");
-            var query = {
-                "email": {
-                    "$regex": regex
-                }
-            };
-            this.collection.count(query)
-                .then(count => {
-                    resolve(count > 0);
-                })
-                .catch(e => {
-                    reject(e);
-                });
-        });
+    _beforeUpdate(data) {
+        if (data.password && data.password.length > 0)
+            data.password = sha1(data.password);
+        else
+            delete data.password;
+        return Promise.resolve(data);
     }
 
     _getQuery(paging) {
@@ -156,7 +69,7 @@ module.exports = class AccountManager extends BaseManager {
         return new Promise((resolve, reject) => {
             var valid = account;
             // 1. begin: Declare promises.
-            var getAccountPromise = this.collection.singleOrDefault({
+            var getAccountPromise = valid.username ? this.collection.singleOrDefault({
                 "$and": [{
                     _id: {
                         "$ne": new ObjectId(valid._id)
@@ -166,7 +79,7 @@ module.exports = class AccountManager extends BaseManager {
                         "$regex": new RegExp((valid.username || "").trim(), "i")
                     }
                 }]
-            });
+            }) : Promise.resolve(null);
             // 2. begin: Validation.
             Promise.all([getAccountPromise])
                 .then(results => {
@@ -197,7 +110,7 @@ module.exports = class AccountManager extends BaseManager {
 
 
                     // 2c. begin: check if data has any error, reject if it has.
-                    if (Object.getOwnPropertyNames(errors).length > 0) { 
+                    if (Object.getOwnPropertyNames(errors).length > 0) {
                         reject(new ValidationError("data does not pass validation", errors));
                     }
 

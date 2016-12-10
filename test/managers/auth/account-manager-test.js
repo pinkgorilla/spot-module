@@ -192,5 +192,5 @@ it("#09. should error with property username, password, profile.firstname and pr
             catch (ex) {
                 done(ex);
             }
-        })
+        });
 });
