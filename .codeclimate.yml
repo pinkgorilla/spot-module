@@ -9,3 +9,4 @@ ratings:
   - "**.jsx"
 exclude_paths:
 - test/
+- index.js

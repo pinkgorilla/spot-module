@@ -26,7 +26,7 @@ module.exports = class SpotManager extends BaseManager {
             .then((results) => {
                 var spotType = results[0];
 
-                if (!data.name || data.name == "") {
+                if (!data.name || data.name === "") {
                     errors["name"] = "name is required";
                 }
 
