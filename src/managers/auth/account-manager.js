@@ -63,64 +63,73 @@ module.exports = class AccountManager extends BaseManager {
         }
         return query;
     }
+    _getUsernameErrors(account) {
+        var errors = {};
+        if (!account.username || account.username === "")
+            errors["username"] = "username is required";
+        return errors;
+    }
+    _getPasswordErrors(account) {
+        var errors = {};
+        if (!account._id && (!account.password || account.password === ""))
+            errors["password"] = "password is required";
+        return errors;
+    }
+    _getProfileErrors(account) {
+        var errors = {};
+        var profileErrors = {};
+        if (!account.profile.firstname || account.profile.firstname === "")
+            profileErrors["firstname"] = "firstname harus diisi";
 
+        if (!account.profile.gender || account.profile.gender === "")
+            profileErrors["gender"] = "gender harus diisi";
+
+        if (Object.getOwnPropertyNames(profileErrors).length > 0)
+            errors["profile"] = profileErrors;
+
+        return errors;
+    }
     _validate(account) {
         var errors = {};
-        return new Promise((resolve, reject) => {
-            var valid = account;
-            // 1. begin: Declare promises.
-            var getAccountPromise = valid.username ? this.collection.singleOrDefault({
-                "$and": [{
-                    _id: {
-                        "$ne": new ObjectId(valid._id)
-                    }
-                }, {
-                    username: {
-                        "$regex": new RegExp((valid.username || "").trim(), "i")
-                    }
-                }]
-            }) : Promise.resolve(null);
-            // 2. begin: Validation.
-            Promise.all([getAccountPromise])
-                .then(results => {
-                    var _module = results[0];
+        var valid = account;
+        // 1. begin: Declare promises.
+        var getOtherAccount = valid.username ? this.collection.singleOrDefault({
+            "$and": [{
+                _id: {
+                    "$ne": new ObjectId(account._id)
+                }
+            }, {
+                username: {
+                    "$regex": new RegExp((account.username || "").trim(), "i")
+                }
+            }]
+        }) : Promise.resolve(null);
+        // 2. begin: Validation.
+        return Promise.all([getOtherAccount])
+            .then(results => {
+                var _otherAccount = results[0];
 
-                    if (!valid.username || valid.username == "")
-                        errors["username"] = "Username harus diisi";
-                    else if (_module) {
-                        errors["username"] = "Username sudah ada";
-                    }
+                if (_otherAccount) {
+                    errors["username"] = "Username sudah ada";
+                }
+                else
+                    Object.assign(errors, this._getUsernameErrors(account));
 
-                    if (!valid._id && (!valid.password || valid.password == ""))
-                        errors["password"] = "password is required";
+                if (!account.profile)
+                    errors["profile"] = "profile is required";
+                else
+                    Object.assign(errors, this._getProfileErrors(account));
 
-                    if (!valid.profile)
-                        errors["profile"] = "profile is required";
-                    else {
-                        var profileError = {};
-                        if (!valid.profile.firstname || valid.profile.firstname == "")
-                            profileError["firstname"] = "firstname harus diisi";
+                Object.assign(errors, this._getPasswordErrors(account));
 
-                        if (!valid.profile.gender || valid.profile.gender == "")
-                            profileError["gender"] = "gender harus diisi";
+                // 2c. begin: check if data has any error, reject if it has.
+                if (Object.getOwnPropertyNames(errors).length > 0) {
+                    return Promise.reject(new ValidationError("data does not pass validation", errors));
+                }
 
-                        if (Object.getOwnPropertyNames(profileError).length > 0)
-                            errors["profile"] = profileError;
-                    }
-
-
-                    // 2c. begin: check if data has any error, reject if it has.
-                    if (Object.getOwnPropertyNames(errors).length > 0) {
-                        reject(new ValidationError("data does not pass validation", errors));
-                    }
-
-                    valid = new Account(account);
-                    valid.stamp(this.user.username, "manager");
-                    resolve(valid);
-                })
-                .catch(e => {
-                    reject(e);
-                });
-        });
+                valid = new Account(account);
+                valid.stamp(this.user.username, "manager");
+                return Promise.resolve(valid);
+            });
     }
 };

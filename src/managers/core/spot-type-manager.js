@@ -16,7 +16,7 @@ module.exports = class SpotTypeManager extends BaseManager {
     _validate(data) {
         var errors = {};
 
-        if (!data.name || data.name == "") {
+        if (!data.name || data.name === "") {
             errors["name"] = "name is required";
         }
         

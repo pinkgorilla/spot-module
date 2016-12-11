@@ -41,42 +41,50 @@ module.exports = class RoleManager extends BaseManager {
         return query;
     }
 
+    _getNameErrors(role) {
+        var errors = {};
+        if (!role.name || role.name === "")
+            errors["name"] = "name is required";
+        return errors;
+    }
+    _getCodeErrors(role) {
+        var errors = {};
+        if (!role.code || role.code === "")
+            errors["code"] = "code is required";
+        return errors;
+    }
     _validate(role) {
         var errors = {};
-        var valid = role;
         // 1. begin: Declare promises.
-        var getRolePromise = this.collection.singleOrDefault({
+        var getDuplicateRole = this.collection.singleOrDefault({
             "$and": [{
                 _id: {
-                    "$ne": new ObjectId(valid._id)
+                    "$ne": new ObjectId(role._id)
                 }
             }, {
-                code: valid.code
+                code: role.code
             }]
         });
         // 2. begin: Validation.
-        return Promise.all([getRolePromise])
+        return Promise.all([getDuplicateRole])
             .then(results => {
-                var _role = results[0];
+                var _duplicateRole = results[0];
 
-                if (!valid.code || valid.code == "")
-                    errors["code"] = "Code is required";
-                else if (_role) {
+                if (_duplicateRole) {
                     errors["code"] = "Code already exists";
                 }
-
-                if (!valid.name || valid.name == "")
-                    errors["name"] = "Nama Harus diisi";
-
+                else {
+                    Object.assign(errors, this._getCodeErrors(role), this._getNameErrors(role))
+                }
 
                 // 2c. begin: check if data has any error, reject if it has.
                 if (Object.getOwnPropertyNames(errors).length > 0) {
                     return Promise.reject(new ValidationError("data does not pass validation", errors));
                 }
 
-                valid = new Role(valid);
-                valid.stamp(this.user.username, "manager");
-                return Promise.resolve(valid);
+                var validRole = new Role(role);
+                validRole.stamp(this.user.username, "manager");
+                return Promise.resolve(validRole);
             });
     }
 };
