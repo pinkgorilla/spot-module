@@ -4,6 +4,8 @@ node_js:
 services:
 - mongodb
 addons:
+  code_climate:
+      repo_token: 781c786eee99fb8892ab94a7ad92fe68c0231adee73ab09227d5c89734abe912
   apt:
     sources:
     - mongodb-3.2-precise
